@@ -23,11 +23,6 @@ public class SodokuGrid : MonoBehaviour
         SetGridNumber(GameSettings.Instance.GetGameMode());
     }
 
-    void Update()
-    {
-
-    }
-
     public void CreateGrid()
     {
         SpawnGridSquare();
@@ -92,6 +87,7 @@ public class SodokuGrid : MonoBehaviour
         for(int i = 0; i < grid_squares.Count; i++)
         {
             grid_squares[i].GetComponent<GridSquare>().SetNumber(data.unsolved_data[i]);
+            grid_squares[i].GetComponent<GridSquare>().SetCorrectNumber(data.solved_data[i]);
         }
     }
 }

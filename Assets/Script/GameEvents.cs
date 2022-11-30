@@ -16,9 +16,18 @@ public class GameEvents : MonoBehaviour
     public delegate void SquareSelected(int square_index);
     public static event SquareSelected OnSquareSelected;
 
-    public static void UpdateSquareSelected(int square_index)
+    public static void UpdateSquareSelectedMethod(int square_index)
     {
         if (OnSquareSelected != null)
             OnSquareSelected(square_index);
+    }
+
+    public delegate void WrongNumber();
+    public static event WrongNumber OnWrongNumber;
+
+    public static void OnWrongNumberMethod()
+    {
+        if (OnWrongNumber != null)
+            OnWrongNumber();
     }
 }
