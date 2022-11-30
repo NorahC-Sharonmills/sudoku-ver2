@@ -30,4 +30,22 @@ public class GameEvents : MonoBehaviour
         if (OnWrongNumber != null)
             OnWrongNumber();
     }
+
+    public delegate void GameLose();
+    public static event GameLose OnGameLose;
+    public static void OnGameLoseMeThod()
+    {
+        if (OnGameLose != null)
+            OnGameLose();
+    }
+
+    //-------------------------------------
+    public delegate void NotesActive(bool active);
+    public static event NotesActive OnNotesActive;
+
+    public static void OnNotesActiveMethod(bool active)
+    {
+        if (OnNotesActive != null)
+            OnNotesActive(active);
+    }
 }

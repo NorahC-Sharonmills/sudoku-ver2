@@ -23,6 +23,17 @@ public class Lives : MonoBehaviour
             error_number++;
             lives_count--;
         }
+
+        CheckForGameLose();
+    }
+
+    private void CheckForGameLose()
+    {
+        if (lives_count <= 0)
+        {
+            GameEvents.OnGameLoseMeThod();
+            UIHelper.FindScript<PopupLose>().Show();
+        }
     }
 
     private void OnEnable()

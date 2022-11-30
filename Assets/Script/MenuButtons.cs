@@ -43,4 +43,10 @@ public class MenuButtons : MonoBehaviour
     {
         obj.SetActive(false);
     }
+
+    public void Pause()
+    {
+        GameSettings.Instance.SetPause(true);
+        UIHelper.FindScript<PopupPause>().Show();
+    }
 }

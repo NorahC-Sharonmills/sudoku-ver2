@@ -14,9 +14,14 @@ public class GameSettings : MonoSingletonGlobal<GameSettings>
     }
 
     private EGameMode _GameMode;
+    private bool _Paused = false;
+
+    public void SetPause(bool _paused = true) { _Paused = _paused; }
+    public bool GetPause() { return _Paused; }
 
     private void Start()
     {
+        _Paused = false;
         _GameMode = EGameMode.NOT_SET;
     }
 
