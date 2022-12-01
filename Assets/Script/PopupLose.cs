@@ -16,7 +16,24 @@ public class PopupLose : UICanvas
 
     public void Exit()
     {
-        Hide();
-        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+        AdsManager.Instance.ShowInter(() =>
+        {
+            Hide();
+            GameSettings.Instance.SetExitAfterWon(true);
+            SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+        });
+    }
+
+    public void Continute()
+    {
+        AdsManager.Instance.ShowReward(() =>
+        {
+            Hide();
+            Lives.Instance.ResetLives();
+            Clock.Instance.StartClock();
+        }, () =>
+        {
+            Exit();
+        });
     }
 }

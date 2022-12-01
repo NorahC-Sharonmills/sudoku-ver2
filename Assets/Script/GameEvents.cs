@@ -65,4 +65,24 @@ public class GameEvents : MonoBehaviour
         if (OnClearNumber != null)
             OnClearNumber();
     }
+
+    //*****************************************
+    public delegate void SaveBoardData();
+    public static event SaveBoardData OnSaveBoadData;
+
+    public static void OnSaveBoardDataMethod()
+    {
+        if (OnSaveBoadData != null)
+            OnSaveBoadData();
+    }
+
+    //*****************************************
+    public delegate void GiveAHint();
+    public static event GiveAHint OnGiveAHint;
+
+    public static void OnGiveAHintMethod()
+    {
+        if (OnGiveAHint != null)
+            OnGiveAHint();
+    }
 }

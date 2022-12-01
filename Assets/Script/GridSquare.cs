@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using System;
+using DG.Tweening;
 
 public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPointerUpHandler, IPointerExitHandler
 {
@@ -18,6 +19,7 @@ public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPoi
     private bool has_default_value_ = false;
     private bool has_wrong_value_ = false;
 
+    public int GetCorrectNumber() { return correct_number_; }
     public int GetSquareNumber() { return number_; }
     public bool IsCorrectNumberSet() { return number_ == correct_number_; }
     public bool HasWrongValue() { return has_default_value_; }
@@ -39,6 +41,11 @@ public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPoi
         {
             has_wrong_value_ = true;
             SetSquareColor(Color.red);
+        }
+        else if(number_ != 0 && number_ == correct_number_)
+        {
+            has_default_value_ = true;
+            has_wrong_value_ = false;
         }
     }
 
@@ -127,6 +134,11 @@ public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPoi
             number_text.GetComponent<Text>().text = " ";
         else
             number_text.GetComponent<Text>().text = number_.ToString();
+
+        if(has_default_value_)
+        {
+            number_text.GetComponent<Text>().fontStyle = FontStyle.Bold;
+        }
     }
 
     public void SetNumber(int _number)
@@ -153,6 +165,7 @@ public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPoi
         GameEvents.OnSquareSelected += OnSquareSelected;
         GameEvents.OnNotesActive += OnNotesActive;
         GameEvents.OnClearNumber += OnClearNumber;
+        GameEvents.OnGameLose += OnGameLose;
     }
 
     protected override void OnDisable()
@@ -162,41 +175,70 @@ public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPoi
         GameEvents.OnSquareSelected -= OnSquareSelected;
         GameEvents.OnNotesActive -= OnNotesActive;
         GameEvents.OnClearNumber -= OnClearNumber;
+        GameEvents.OnGameLose -= OnGameLose;
+    }
+
+    private void OnGameLose()
+    {
+        if(number_ != 0 && number_ != correct_number_)
+        {
+            has_default_value_ = false;
+            SetSquareColor(Color.white);
+            number_ = 0;
+            DisplayText();
+        }
+    }
+
+    public void SetCorrectValueOnHint()
+    {
+        SetSquareNumber(correct_number_);
+        Shake();
+    }
+
+    private void Shake()
+    {
+        this.transform.DOKill();
+        this.transform.DOShakeScale(0.3f);
     }
 
     public void OnSetNumber(int _number)
     {
         if (selected_ && has_default_value_ == false)
         {
-            if (note_active == true && has_default_value_ == false)
-            {
-                SetNoteSingleNumberValue(_number);
-            }
-            else if(note_active == false)
-            {
-                SetNoteNumberValue(0);
-                SetNumber(_number);
-                if (_number != correct_number_)
-                {
-                    has_wrong_value_ = true;
-
-                    var colors = this.colors;
-                    colors.normalColor = Color.red;
-                    this.colors = colors;
-
-                    GameEvents.OnWrongNumberMethod();
-                }
-                else
-                {
-                    has_wrong_value_ = false;
-
-                    has_default_value_ = true;
-                    var colors = this.colors;
-                    colors.normalColor = Color.white;
-                    this.colors = colors;
-                }
-            }
+            SetSquareNumber(_number);
         }    
+    }
+
+    private void SetSquareNumber(int _number)
+    {
+        if (note_active == true && has_default_value_ == false)
+        {
+            SetNoteSingleNumberValue(_number);
+        }
+        else if (note_active == false)
+        {
+            SetNoteNumberValue(0);
+            SetNumber(_number);
+            if (_number != correct_number_)
+            {
+                has_wrong_value_ = true;
+
+                var colors = this.colors;
+                colors.normalColor = Color.red;
+                this.colors = colors;
+
+                GameEvents.OnWrongNumberMethod();
+            }
+            else
+            {
+                has_wrong_value_ = false;
+
+                has_default_value_ = true;
+                var colors = this.colors;
+                colors.normalColor = Color.white;
+                this.colors = colors;
+            }
+        }
     }
 
     public void OnSquareSelected(int square_index)

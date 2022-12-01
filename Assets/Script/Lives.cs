@@ -58,4 +58,15 @@ public class Lives : MonoSingleton<Lives>
     {
         GameEvents.OnWrongNumber -= WrongNumber;
     }
+
+    public void ResetLives()
+    {
+        error_images.ForEach((error) =>
+        {
+            error.SetActive(false);
+        });
+
+        error_number = 0;
+        lives_count = error_images.Count;
+    }
 }

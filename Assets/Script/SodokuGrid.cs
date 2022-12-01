@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,6 +27,8 @@ public class SodokuGrid : MonoBehaviour
             SetGirdFromFile();
         else
             SetGridNumber(GameSettings.Instance.GetGameMode());
+
+        AdsManager.Instance.ShowBanner();
     }
 
     private void SetGirdFromFile()
@@ -128,9 +130,10 @@ public class SodokuGrid : MonoBehaviour
     {
         for(int i = 0; i < grid_squares.Count; i++)
         {
+            grid_squares[i].GetComponent<GridSquare>().SetHasDefaultValue(data.unsolved_data[i] != 0 && data.unsolved_data[i] == data.solved_data[i]);
             grid_squares[i].GetComponent<GridSquare>().SetNumber(data.unsolved_data[i]);
             grid_squares[i].GetComponent<GridSquare>().SetCorrectNumber(data.solved_data[i]);
-            grid_squares[i].GetComponent<GridSquare>().SetHasDefaultValue(data.unsolved_data[i] != 0 && data.unsolved_data[i] == data.solved_data[i]);
+            //grid_squares[i].GetComponent<GridSquare>().SetHasDefaultValue(data.unsolved_data[i] != 0 && data.unsolved_data[i] == data.solved_data[i]);
         }
     }
 
@@ -138,44 +141,70 @@ public class SodokuGrid : MonoBehaviour
     {
         GameEvents.OnSquareSelected += OnSquareSelected;
         GameEvents.OnUpdateSquareNumber += CheckBoardComplete;
+        GameEvents.OnSaveBoadData += OnSaveBoard;
+        GameEvents.OnGiveAHint += OnGiveAHint;
     }
 
     private void OnDisable()
     {
         GameEvents.OnSquareSelected -= OnSquareSelected;
         GameEvents.OnUpdateSquareNumber -= CheckBoardComplete;
+        GameEvents.OnSaveBoadData -= OnSaveBoard;
+        GameEvents.OnGiveAHint -= OnGiveAHint;
+    }
 
-        try
+    private void OnGiveAHint()
+    {
+        var square_indexers = new List<int>();
+
+        for(int i = 0; i < grid_squares.Count; i++)
         {
-            //**********************
-            var solved_data = SudokuData.Instance.sudoku_game[GameSettings.Instance.GetGameMode()][selected_grid_data].solved_data;
-            int[] unsolved_data = new int[81];
-            Dictionary<string, List<string>> grid_notes = new Dictionary<string, List<string>>();
-
-            for (int i = 0; i < grid_squares.Count; i++)
+            var comp = grid_squares[i].GetComponent<GridSquare>();
+            if(comp.GetSquareNumber() == 0 && comp.GetHasDefaultValue() == false)
             {
-                var comp = grid_squares[i].GetComponent<GridSquare>();
-                unsolved_data[i] = comp.GetSquareNumber();
-
-                string key = $"square_note:{i}";
-                grid_notes.Add(key, comp.GetSquareNote());
-            }
-
-            SudokuData.SudokuBoardData curent_game_data = new SudokuData.SudokuBoardData(unsolved_data, solved_data);
-            if (GameSettings.Instance.GetExitAfterWon() == false) //do not save data when exit after level complete data
-            {
-                Config.SaveBoardData(curent_game_data, GameSettings.Instance.GetGameMode(), selected_grid_data,
-                    Lives.Instance.GetErrorNumber(), grid_notes);
-            }
-            else
-            {
-                Config.DeleteDataFile();
+                square_indexers.Add(i);
             }
         }
-        catch (System.Exception ex)
+
+        //we dont not have any empty square
+        if (square_indexers.Count == 0)
+            return;
+
+        var random_index = UnityEngine.Random.Range(0, square_indexers.Count);
+        var square_index = square_indexers[random_index];
+        grid_squares[square_index].GetComponent<GridSquare>().SetCorrectValueOnHint();
+        GameEvents.UpdateSquareNumberMethod(grid_squares[square_index].GetComponent<GridSquare>().GetCorrectNumber());
+    }
+
+    private void OnSaveBoard()
+    {
+        //**********************
+        var solved_data = SudokuData.Instance.sudoku_game[GameSettings.Instance.GetGameMode()][selected_grid_data].solved_data;
+        int[] unsolved_data = new int[81];
+        Dictionary<string, List<string>> grid_notes = new Dictionary<string, List<string>>();
+
+        for (int i = 0; i < grid_squares.Count; i++)
         {
-            Debug.Log("error :)");
+            var comp = grid_squares[i].GetComponent<GridSquare>();
+            unsolved_data[i] = comp.GetSquareNumber();
+
+            string key = $"square_note:{i}";
+            grid_notes.Add(key, comp.GetSquareNote());
         }
+
+        SudokuData.SudokuBoardData curent_game_data = new SudokuData.SudokuBoardData(unsolved_data, solved_data);
+        if (GameSettings.Instance.GetExitAfterWon() == false) //do not save data when exit after level complete data
+        {
+            Config.SaveBoardData(curent_game_data, GameSettings.Instance.GetGameMode(), selected_grid_data,
+                Lives.Instance.GetErrorNumber(), grid_notes);
+        }
+        else
+        {
+            Config.DeleteDataFile();
+        }
+
+        AdsManager.Instance.HideBanner();
+        GameSettings.Instance.SetExitAfterWon(false);
     }
 
     private void SetSquareColor(int[] data, Color color)
@@ -183,10 +212,12 @@ public class SodokuGrid : MonoBehaviour
         data.ForEach((index) =>
         {
             var comp = grid_squares[index].GetComponent<GridSquare>();
-            if (comp.HasWrongValue() == false && comp.IsSelected() == false)
-            {
-                comp.SetSquareColor(color);
-            }
+            // cái này check những số nào đã nhập đúng rồi thì không sáng
+            //if (comp.HasWrongValue() == false && comp.IsSelected() == false)
+            //{
+            //    comp.SetSquareColor(color);
+            //}
+            comp.SetSquareColor(color);
         });
     }
 
@@ -196,23 +227,40 @@ public class SodokuGrid : MonoBehaviour
         var vertical_line = LineIndicator.Instance.GetVerticalLine(square_index);
         var square = LineIndicator.Instance.GetSquare(square_index);
 
-        SetSquareColor(LineIndicator.Instance.GetAllSquareIndexers(), Color.white);
-        SetSquareColor(horizontal_line, line_highlight_color);
-        SetSquareColor(vertical_line, line_highlight_color);
-        SetSquareColor(square, line_highlight_color);
+        if(grid_squares[square_index].GetComponent<GridSquare>().GetHasDefaultValue() == false)
+        {
+            SetSquareColor(LineIndicator.Instance.GetAllSquareIndexers(), Color.white);
+            SetSquareColor(horizontal_line, line_highlight_color);
+            SetSquareColor(vertical_line, line_highlight_color);
+            SetSquareColor(square, line_highlight_color);
+        }
+        else
+        {
+            grid_squares.ForEach((square) =>
+            {
+                var comp = square.GetComponent<GridSquare>();
+                if(comp.HasWrongValue() == false && comp.IsSelected() == false)
+                {
+                    comp.SetSquareColor(Color.white);
+                }
+            });
+        }
     }
 
     private void CheckBoardComplete(int number)
     {
-        bool done = true;
-        grid_squares.ForEach((square) =>
+        int done = -1;
+        for(int i = 0; i < grid_squares.Count; i++)
         {
-            var comp = square.GetComponent<GridSquare>();
+            done = 1;
+            var comp = grid_squares[i].GetComponent<GridSquare>();
             if (comp.IsCorrectNumberSet() == false)
-                done = false;
-        });
-
-        if (done)
+            {
+                done = 0;
+                break;
+            }
+        }
+        if (done == 1)
             GameEvents.OnBoardCompleteMethod();
     }
 

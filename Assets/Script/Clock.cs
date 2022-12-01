@@ -72,4 +72,9 @@ public class Clock : MonoSingleton<Clock>
     {
         return Instance.delta_time.ToString();
     }    
+
+    public void StartClock()
+    {
+        stop_clock = false;
+    }
 }

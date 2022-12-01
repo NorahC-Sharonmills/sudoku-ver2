@@ -22,9 +22,14 @@ public class PopupPause : UICanvas
 
     public void Exit()
     {
-        base.Hide();
-        GameSettings.Instance.SetPause(false);
-        GameSettings.Instance.SetGameMode(GameSettings.EGameMode.NOT_SET);
-        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+        AdsManager.Instance.ShowInter(() =>
+        {
+            base.Hide();
+            GameSettings.Instance.SetExitAfterWon(false);
+            GameEvents.OnSaveBoardDataMethod();
+            GameSettings.Instance.SetPause(false);
+            GameSettings.Instance.SetGameMode(GameSettings.EGameMode.NOT_SET);
+            SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+        });
     }
 }

@@ -10,21 +10,27 @@ public class PopupWin : UICanvas
 
     public override void Show()
     {
-        Debug.Log("show");
         base.Show();
         textClock.text = Clock.Instance.GetCurrentTimeText().text;
     }
 
     public void Exit()
     {
-        Hide();
-        GameSettings.Instance.SetExitAfterWon(true);
-        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+        AdsManager.Instance.ShowInter(() =>
+        {
+            Hide();
+            GameSettings.Instance.SetExitAfterWon(true);
+            SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+        });
     }
 
     public void Play()
     {
-        Hide();
-        SceneManager.LoadScene("Game", LoadSceneMode.Single);
+        AdsManager.Instance.ShowInter(() =>
+        {
+            Hide();
+            GameSettings.Instance.SetExitAfterWon(true);
+            SceneManager.LoadScene("Game", LoadSceneMode.Single);
+        });
     }
 }
