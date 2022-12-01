@@ -39,7 +39,15 @@ public class GameEvents : MonoBehaviour
             OnGameLose();
     }
 
-    //-------------------------------------
+    public delegate void BoardComplete();
+    public static event BoardComplete OnBoardComplete;
+    public static void OnBoardCompleteMethod()
+    {
+        if (OnBoardComplete != null)
+            OnBoardComplete();
+    }
+
+    //*****************************************
     public delegate void NotesActive(bool active);
     public static event NotesActive OnNotesActive;
 
@@ -47,5 +55,14 @@ public class GameEvents : MonoBehaviour
     {
         if (OnNotesActive != null)
             OnNotesActive(active);
+    }
+
+    public delegate void ClearNumber();
+    public static event ClearNumber OnClearNumber;
+
+    public static void OnClearNumberMethod()
+    {
+        if (OnClearNumber != null)
+            OnClearNumber();
     }
 }

@@ -18,8 +18,9 @@ public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPoi
     private bool has_default_value_ = false;
     private bool has_wrong_value_ = false;
 
+    public int GetSquareNumber() { return number_; }
+    public bool IsCorrectNumberSet() { return number_ == correct_number_; }
     public bool HasWrongValue() { return has_default_value_; }
-
     public void SetHasDefaultValue(bool has_default) { has_default_value_ = has_default; }
     public bool GetHasDefaultValue() { return has_default_value_; }
 
@@ -33,6 +34,19 @@ public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPoi
     {
         correct_number_ = number;
         has_default_value_ = false;
+
+        if(number_ != 0 && number_ != correct_number_)
+        {
+            has_wrong_value_ = true;
+            SetSquareColor(Color.red);
+        }
+    }
+
+    public void SetCorrectNumber()
+    {
+        number_ = correct_number_;
+        SetNoteNumberValue(0);
+        DisplayText();
     }
 
     protected override void Start()
@@ -41,7 +55,10 @@ public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPoi
         selected_ = false;
         note_active = false;
 
-        SetNoteNumberValue(0);
+        if (GameSettings.Instance.GetContinutePreviousGame() == false)
+            SetNoteNumberValue(0);
+        else
+            SetClearEmptyNotes();
     }
 
     public List<string> GetSquareNote()
@@ -135,6 +152,7 @@ public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPoi
         GameEvents.OnUpdateSquareNumber += OnSetNumber;
         GameEvents.OnSquareSelected += OnSquareSelected;
         GameEvents.OnNotesActive += OnNotesActive;
+        GameEvents.OnClearNumber += OnClearNumber;
     }
 
     protected override void OnDisable()
@@ -143,6 +161,7 @@ public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPoi
         GameEvents.OnUpdateSquareNumber -= OnSetNumber;
         GameEvents.OnSquareSelected -= OnSquareSelected;
         GameEvents.OnNotesActive -= OnNotesActive;
+        GameEvents.OnClearNumber -= OnClearNumber;
     }
 
     public void OnSetNumber(int _number)
@@ -159,7 +178,7 @@ public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPoi
                 SetNumber(_number);
                 if (_number != correct_number_)
                 {
-                    has_default_value_ = true;
+                    has_wrong_value_ = true;
 
                     var colors = this.colors;
                     colors.normalColor = Color.red;
@@ -169,7 +188,7 @@ public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPoi
                 }
                 else
                 {
-                    has_default_value_ = false;
+                    has_wrong_value_ = false;
 
                     has_default_value_ = true;
                     var colors = this.colors;
@@ -193,5 +212,17 @@ public class GridSquare : Selectable, IPointerClickHandler, ISubmitHandler, IPoi
         var colors = this.colors;
         colors.normalColor = color;
         this.colors = colors;
+    }
+
+    public void OnClearNumber()
+    {
+        if(selected_ && !has_default_value_)
+        {
+            number_ = 0;
+            has_wrong_value_ = false;
+            SetSquareColor(Color.white);
+            SetNoteNumberValue(0);
+            DisplayText();
+        }
     }
 }

@@ -24,6 +24,8 @@ public class Clock : MonoSingleton<Clock>
     {
         delta_time = 0;
         stop_clock = false;
+        if (GameSettings.Instance.GetContinutePreviousGame())
+            delta_time = Config.ReadGameTime();
     }
 
     void Update()
@@ -65,4 +67,9 @@ public class Clock : MonoSingleton<Clock>
     {
         return textClock;
     }
+
+    public static string GetCurretTime()
+    {
+        return Instance.delta_time.ToString();
+    }    
 }

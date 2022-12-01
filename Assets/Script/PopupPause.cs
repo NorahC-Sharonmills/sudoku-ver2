@@ -16,13 +16,15 @@ public class PopupPause : UICanvas
 
     public override void Hide()
     {
-        GameSettings.Instance.SetPause(false);
         base.Hide();
+        GameSettings.Instance.SetPause(false);
     }
 
     public void Exit()
     {
-        Hide();
+        base.Hide();
+        GameSettings.Instance.SetPause(false);
+        GameSettings.Instance.SetGameMode(GameSettings.EGameMode.NOT_SET);
         SceneManager.LoadScene("Menu", LoadSceneMode.Single);
     }
 }

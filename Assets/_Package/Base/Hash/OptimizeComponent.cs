@@ -41,4 +41,13 @@ public static class OptimizeComponent
         _stringBuilderOS.Append(_str);
         return _stringBuilderOS.ToString();
     }
+
+    public static string AddString(this string _builder, string _str)
+    {
+        _stringBuilderOS.Clear();
+        _stringBuilderOS.Append(_builder);
+        _stringBuilderOS.Append(_str);
+        _builder = _stringBuilderOS.ToString();
+        return _builder;
+    }
 }

@@ -13,8 +13,25 @@ public class GameSettings : MonoSingletonGlobal<GameSettings>
         VERY_HARD
     }
 
-    private EGameMode _GameMode;
-    private bool _Paused = false;
+    [SerializeField] private EGameMode _GameMode;
+    [SerializeField] private bool _Paused = false;
+
+    private bool _ContinutePreviousGame = false;
+    private bool _exitAfterWin = false;
+
+    public void SetExitAfterWon(bool set)
+    {
+        _exitAfterWin = set;
+        _ContinutePreviousGame = false;
+    }
+
+    public bool GetExitAfterWon() { return _exitAfterWin; }
+    public void SetContinutePreviousGame(bool continute_game)
+    {
+        _ContinutePreviousGame = continute_game;
+    }
+
+    public bool GetContinutePreviousGame() { return _ContinutePreviousGame; }
 
     public void SetPause(bool _paused = true) { _Paused = _paused; }
     public bool GetPause() { return _Paused; }
@@ -23,6 +40,7 @@ public class GameSettings : MonoSingletonGlobal<GameSettings>
     {
         _Paused = false;
         _GameMode = EGameMode.NOT_SET;
+        _ContinutePreviousGame = false;
     }
 
     public void SetGameMode(EGameMode mode)

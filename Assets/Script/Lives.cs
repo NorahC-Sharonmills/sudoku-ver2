@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Lives : MonoBehaviour
+public class Lives : MonoSingleton<Lives>
 {
     public List<GameObject> error_images;
 
@@ -13,6 +13,17 @@ public class Lives : MonoBehaviour
     {
         lives_count = error_images.Count;
         error_number = 0;
+
+        if(GameSettings.Instance.GetContinutePreviousGame())
+        {
+            error_number = Config.ErrorNumber();
+            lives_count = error_images.Count - error_number;
+
+            for(int error = 0; error < error_number; error++)
+            {
+                error_images[error].SetActive(true);
+            }
+        }
     }
 
     private void WrongNumber()
@@ -26,6 +37,8 @@ public class Lives : MonoBehaviour
 
         CheckForGameLose();
     }
+
+    public int GetErrorNumber() { return error_number; }
 
     private void CheckForGameLose()
     {
