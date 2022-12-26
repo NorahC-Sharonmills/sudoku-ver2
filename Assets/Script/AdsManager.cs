@@ -148,6 +148,8 @@ public class AdsManager : MonoSingletonGlobal<AdsManager>
     private RewardedAd RewardView;
     private void RequestReward()
     {
+        RewardStatus = AdStatus.Loading;
+
         // Initialize an Reward.
         this.RewardView = new RewardedAd(RewardId);
 

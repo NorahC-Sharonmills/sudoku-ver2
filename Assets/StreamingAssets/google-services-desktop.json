@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "552026576782",
+    "project_id": "sudoku-classic-a1fe4",
+    "storage_bucket": "sudoku-classic-a1fe4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:552026576782:android:eb956587d38a7a506e76df",
+        "android_client_info": {
+          "package_name": "sudoku.nonogram.classic.lumosity"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "552026576782-dqv5l8nk0s62jd684csl4j9ggr2sede0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgAqaeERVtUG0WXTS5_kyB6wUaiR4KnQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "552026576782-dqv5l8nk0s62jd684csl4j9ggr2sede0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
